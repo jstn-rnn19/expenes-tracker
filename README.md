@@ -18,3 +18,8 @@ Application should run from the command line and should have the following featu
 - Add expense categories and allow users to filter expenses by category.
 - Allow users to set a budget for each month and show a warning when the user exceeds the budget.
 - Allow users to export expenses to a CSV file.
+
+
+### here roadmap.sh python and this is the project
+- #### https://roadmap.sh/projects/expense-tracker
+- #### https://roadmap.sh/projects/expense-tracker
