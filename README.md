@@ -21,5 +21,5 @@ Application should run from the command line and should have the following featu
 
 
 ### here roadmap.sh python and this is the project
-- #### https://roadmap.sh/projects/expense-tracker
+- #### https://roadmap.sh/python
 - #### https://roadmap.sh/projects/expense-tracker
