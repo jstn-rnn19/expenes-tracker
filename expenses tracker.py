@@ -1,7 +1,8 @@
 import csv
 import csv as cs
 import os as root
-import datetime as date
+import datetime as date_time
+import calendar as calendar_name
 
 expenses_file = "expenses.csv"
 
@@ -19,7 +20,7 @@ def adding_expenses(info, amount, file):
         "Id": new_id,
         "Description": info,
         "Amount": amount,
-        "Date": date.datetime.now().isoformat(" ", "seconds" )
+        "Date": date_time.datetime.now().isoformat(" ", "seconds" )
     }
     rows.append(new_row)
 
@@ -83,8 +84,10 @@ def update_amount(Id, file):
 def display_expenses(file):
         with open( file, mode='r', newline='' ) as f:
             reader = cs.DictReader(f)
-            for row in reader:
-                print( row )
+            for row in range (reader):
+                yield row
+
+
 
 def delete_expenses(Id, file):
     fieldnames = ["Id", "Description", "Amount", "Date"]
@@ -119,30 +122,58 @@ def display_all_amount(file):
         with open( file, mode='r', newline='' ) as f:
             reader = cs.DictReader( f )
             for row in reader:
-                amount = row.get("Amount", "").strip()
+                amount = row.get( "Amount", "" ).strip()
+                descript = row.get("Description", "").strip()
                 if amount:
                     try:
                         total += float(amount)
                     except ValueError:
                         print(f"skipping Invalid Amount: {amount}")
+                print("===================")
+                yield descript
+                yield amount
+                print( "===================" )
+
+
     except FileNotFoundError:
         print("file not found")
-    print(f"Total Expenses: {total}")
+    yield total
+
+
 
 def display_specific_month(month, file):
+    found = False
+    total = 0.0
+    month_name = calendar_name.month_name[int(month)]
     try:
         with open( file, mode='r', newline='' ) as f:
             reader = cs.DictReader( f )
-            found = False
+
             for row in reader:
-                date = row.get("Date", "")
-                if len(date) >= 7 and date[5:7] == month:
-                    print(row)
-                    found = True
+                date_str = row.get( "Date", "" )
+                descript = row.get( "Description", "" )
+                amount = row.get( "Amount", "" )
+
+                if len( date_str ) >= 7 and int(date_str[5:7]) == int(month):
+                    if not found:
+                        date_obj = date_time.datetime.strptime( date_str, "%Y-%m-%d %H:%M:%S" )
+                        month_name = date_obj.strftime( "%B" )
+                        print( f"Records for {month_name}" )
+                        print( "===================" )
+                        found = True
+
+                    yield descript
+                    yield amount
+                    print( "===================" )
+                    total += float(amount)
+
+
+            print(total)
+
             if not found:
-                print( f"No records found for month {month}" )
+                print( f"No records found for month {month_name}" )
     except FileNotFoundError:
-        print("File mot Found")
+        print( "File not found" )
 
 
 
@@ -170,6 +201,8 @@ def main():
                 adding_expenses(description, amount, expenses_file)
                 print( "======================================" )
 
+
+
             elif user_choice == '2':
                 print( "======================================" )
                 choice = input("Update (1) Description or (2) Amount?: ")
@@ -193,6 +226,8 @@ def main():
                     print( "======================================" )
                     print("Invalid Input")
                     print( "======================================" )
+
+
             elif user_choice == '3':
                 print( "======================================" )
                 display_expenses(expenses_file)
@@ -201,18 +236,34 @@ def main():
                 print( "======================================" )
                 delete_expenses(delete_id, expenses_file)
                 print( "======================================" )
+
+
             elif user_choice == '4':
                 print( "======================================" )
-                display_expenses(expenses_file)
-                print( "======================================" )
-            elif user_choice == '5':
-                print( "======================================" )
-                display_all_amount( expenses_file )
+                display_Expense = display_expenses(expenses_file)
+                for expenses in display_Expense:
+                    print(expenses)
                 print( "======================================" )
 
+
+            elif user_choice == '5':
+                print( "======================================" )
+                display_Expense = display_all_amount( expenses_file )
+
+
+                for amount  in display_Expense:
+
+                    print(amount)
+                print( "======================================" )
+
+
+
             elif user_choice == '6':
-                month = input("Enter Month (Ex. 05): ")
-                display_specific_month(month, expenses_file)
+                month = int(input("Enter Month (Ex. '05' or '5'): "))
+                if 1 <= month <= 12:
+                    display_month = display_specific_month(month, expenses_file)
+                    for date in display_month:
+                        print(date)
             elif user_choice == '7':
                 break
             else:
@@ -221,6 +272,7 @@ def main():
         except (TypeError, SyntaxError, ValueError):
             print("Invalid Input")
         finally:
+            print( "======================================" )
             print("Execute Successfully")
             pass
 
